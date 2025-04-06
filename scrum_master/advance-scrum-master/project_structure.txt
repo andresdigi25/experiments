@@ -1,0 +1,8 @@
+scrummaster/
+├── __init__.py         # Package initialization
+├── core.py             # Core functionality (ScrumMaster, ScrumData, NLPAnalyzer, etc.)
+├── cli.py              # CLI interface using Textual
+└── api.py              # API interface using FastAPI
+
+setup.py                # Package setup script
+README.md               # Project documentation

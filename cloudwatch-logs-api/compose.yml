@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: cloudwatch-logs-api
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./app:/app/app
+    env_file:
+      - .env
+    environment:
+      - AWS_REGION=${AWS_REGION:-us-east-1}
+      # AWS credentials will be read from .env file
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+
+# Create a sample .env file with the following:
+# AWS_REGION=us-east-1
+# AWS_ACCESS_KEY_ID=your-access-key
+# AWS_SECRET_ACCESS_KEY=your-secret-key
+# LOG_LEVEL=INFO
+# MAX_LOGS_RESULTS=1000
+# MAX_QUERY_DURATION_SECONDS=300

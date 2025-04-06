@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: sqlalchemy_demo_postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: sqlalchemy_demo
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - sqlalchemy_network
+
+  demo_app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: sqlalchemy_demo_app
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - sqlalchemy_network
+    volumes:
+      - ./:/app
+
+networks:
+  sqlalchemy_network:
+    name: sqlalchemy_network
+
+volumes:
+  postgres_data:
+    name: sqlalchemy_demo_postgres_data

@@ -1,0 +1,125 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'CloudWatch Logs API for Power BI Integration'
+
+Resources:
+  # IAM Role for the Lambda function
+  CloudWatchLogsLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: CloudWatchLogsAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:StartQuery
+                  - logs:GetQueryResults
+                  - logs:StopQuery
+                  - logs:DescribeLogGroups
+                  - logs:FilterLogEvents
+                Resource: '*'  # Scope this down to specific log groups in production
+
+  # Lambda Function
+  CloudWatchLogsLambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: CloudWatchLogsForPowerBI
+      Handler: index.handler
+      Role: !GetAtt CloudWatchLogsLambdaRole.Arn
+      Runtime: nodejs14.x
+      Timeout: 30
+      MemorySize: 256
+      Code:
+        ZipFile: |
+          // Your Lambda code will go here (or you can use S3 for the deployment package)
+          // For brevity, we're not including the full Lambda code in this template
+          // Reference the separate Lambda function code file
+      Environment:
+        Variables:
+          LOG_LEVEL: INFO
+
+  # API Gateway REST API
+  LogsAPI:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: CloudWatchLogsAPI
+      Description: API for fetching CloudWatch logs for Power BI
+      EndpointConfiguration:
+        Types:
+          - REGIONAL
+
+  # API Gateway Resource
+  LogsResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref LogsAPI
+      ParentId: !GetAtt LogsAPI.RootResourceId
+      PathPart: logs
+
+  # API Gateway Method (GET)
+  LogsMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref LogsAPI
+      ResourceId: !Ref LogsResource
+      HttpMethod: GET
+      AuthorizationType: NONE  # Consider adding API Key or other auth for production
+      Integration:
+        Type: AWS
+        IntegrationHttpMethod: POST
+        Uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${CloudWatchLogsLambda.Arn}/invocations
+        IntegrationResponses:
+          - StatusCode: 200
+            ResponseParameters:
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+        PassthroughBehavior: WHEN_NO_TEMPLATES
+        RequestTemplates:
+          application/json: |
+            {
+              "queryStringParameters": {
+                #foreach($param in $input.params().querystring.keySet())
+                "$param": "$util.escapeJavaScript($input.params().querystring.get($param))"
+                #if($foreach.hasNext),#end
+                #end
+              }
+            }
+      MethodResponses:
+        - StatusCode: 200
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Origin: true
+
+  # API Gateway Deployment
+  LogsAPIDeployment:
+    Type: AWS::ApiGateway::Deployment
+    DependsOn:
+      - LogsMethod
+    Properties:
+      RestApiId: !Ref LogsAPI
+      StageName: prod
+
+  # Lambda Permission for API Gateway
+  LambdaPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref CloudWatchLogsLambda
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${LogsAPI}/*/GET/logs
+
+Outputs:
+  ApiEndpoint:
+    Description: URL for the API Gateway endpoint
+    Value: !Sub https://${LogsAPI}.execute-api.${AWS::Region}.amazonaws.com/prod/logs
+  LambdaFunction:
+    Description: Lambda function for CloudWatch Logs
+    Value: !Ref CloudWatchLogsLambda

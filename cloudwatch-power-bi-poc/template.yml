@@ -1,0 +1,53 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: 'CloudWatch Logs API for Power BI Integration using SAM'
+
+Resources:
+  # Lambda Function
+  CloudWatchLogsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: CloudWatchLogsForPowerBI
+      Handler: index.handler
+      Runtime: nodejs18.x
+      Timeout: 30
+      MemorySize: 256
+      Policies:
+        - CloudWatchLogsReadOnlyAccess  # Simplified policy using SAM policy templates
+        - Statement:
+            # Additional permissions for Logs Insights queries
+            - Effect: Allow
+              Action:
+                - logs:StartQuery
+                - logs:GetQueryResults
+                - logs:StopQuery
+              Resource: '*'  # Scope this down to specific log groups in production
+      Environment:
+        Variables:
+          LOG_LEVEL: INFO
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /logs
+            Method: get
+            RestApiId: !Ref LogsApi
+
+  # API Gateway
+  LogsApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: CloudWatchLogsAPI
+      StageName: prod
+      Cors:
+        AllowMethods: "'GET,OPTIONS'"
+        AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'"
+        AllowOrigin: "'*'"  # Restrict for production
+
+Outputs:
+  ApiEndpoint:
+    Description: URL for the API Gateway endpoint
+    Value: !Sub https://${LogsApi}.execute-api.${AWS::Region}.amazonaws.com/prod/logs
+  LambdaFunction:
+    Description: Lambda function for CloudWatch Logs
+    Value: !Ref CloudWatchLogsFunction

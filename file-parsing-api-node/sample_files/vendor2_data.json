@@ -1,0 +1,42 @@
+[
+    {
+      "client_name": "Hermione Granger",
+      "billing_address": "12 Grimmauld Place",
+      "billing_city": "London",
+      "billing_state": "UK",
+      "billing_zip": "SW1A 1AA",
+      "client_code": "V2_001"
+    },
+    {
+      "client_name": "Ron Weasley",
+      "billing_address": "The Burrow",
+      "billing_city": "Ottery St Catchpole",
+      "billing_state": "UK",
+      "billing_zip": "EX11 1DJ",
+      "client_code": "V2_002"
+    },
+    {
+      "client_name": "Harry Potter",
+      "billing_address": "4 Privet Drive",
+      "billing_city": "Little Whinging",
+      "billing_state": "UK",
+      "billing_zip": "GU25 4PH",
+      "client_code": "V2_003"
+    },
+    {
+      "client_name": "Albus Dumbledore",
+      "billing_address": "Hogwarts School",
+      "billing_city": "Hogsmeade",
+      "billing_state": "UK",
+      "billing_zip": "IV27 4NH",
+      "client_code": "V2_004"
+    },
+    {
+      "client_name": "Severus Snape",
+      "billing_address": "Spinner's End",
+      "billing_city": "Cokeworth",
+      "billing_state": "UK",
+      "billing_zip": "M1 1AE",
+      "client_code": "V2_005"
+    }
+  ]

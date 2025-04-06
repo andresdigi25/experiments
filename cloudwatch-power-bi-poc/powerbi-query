@@ -1,0 +1,45 @@
+// Power BI M Query (Power Query) to fetch data from API Gateway
+let
+    // API Gateway URL from CloudFormation output
+    ApiUrl = "https://your-api-id.execute-api.your-region.amazonaws.com/prod/logs",
+    
+    // Parameters for the query (can be made dynamic with Power BI parameters)
+    StartTime = DateTime.ToText(DateTime.AddDays(DateTime.FixedLocalNow(), -1), "yyyy-MM-dd'T'HH:mm:ss'Z'"),
+    FilterPattern = "",  // Optional filter pattern
+    
+    // Build the full URL with query parameters
+    FullUrl = ApiUrl & "?startTime=" & StartTime & "&filterPattern=" & FilterPattern,
+    
+    // Make the API call
+    Source = Json.Document(Web.Contents(FullUrl)),
+    
+    // Extract the logs array from the response
+    LogsTable = Source[logs],
+    
+    // Convert to a table
+    #"Converted to Table" = Table.FromList(LogsTable, Splitter.SplitByNothing(), null, null, ExtraValues.Error),
+    
+    // Expand the column to get all properties
+    #"Expanded Column1" = Table.ExpandRecordColumn(#"Converted to Table", "Column1", 
+        {"timestamp", "service", "level", "message", "requestId", "statusCode", "responseTime", "userId"}, 
+        {"Timestamp", "Service", "Level", "Message", "RequestId", "StatusCode", "ResponseTime", "UserId"}),
+    
+    // Change data types for appropriate columns
+    #"Changed Type" = Table.TransformColumnTypes(#"Expanded Column1",{
+        {"Timestamp", type datetime},
+        {"Service", type text},
+        {"Level", type text},
+        {"Message", type text},
+        {"RequestId", type text},
+        {"StatusCode", Int64.Type},
+        {"ResponseTime", Int64.Type},
+        {"UserId", type text}
+    }),
+    
+    // Add a calculated Date column for easier filtering
+    #"Added Date Column" = Table.AddColumn(#"Changed Type", "Date", each DateTime.Date([Timestamp]), type date),
+    
+    // Add a calculated Hour column for time-based analysis
+    #"Added Hour Column" = Table.AddColumn(#"Added Date Column", "Hour", each Time.Hour([Timestamp]), Int64.Type)
+in
+    #"Added Hour Column"

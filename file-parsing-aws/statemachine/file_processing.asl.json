@@ -1,0 +1,88 @@
+{
+    "Comment": "File Processing Workflow",
+    "StartAt": "ValidateFile",
+    "States": {
+      "ValidateFile": {
+        "Type": "Task",
+        "Resource": "${ValidateFileFunctionArn}",
+        "Next": "FileValid?",
+        "InputPath": "$",
+        "ResultPath": "$.validation"
+      },
+      "FileValid?": {
+        "Type": "Choice",
+        "Choices": [
+          {
+            "Variable": "$.validation.isValid",
+            "BooleanEquals": true,
+            "Next": "DetermineFileType"
+          }
+        ],
+        "Default": "ReportValidationFailure"
+      },
+      "DetermineFileType": {
+        "Type": "Task",
+        "Resource": "${DetermineFileTypeFunctionArn}",
+        "Next": "ParseFile",
+        "InputPath": "$",
+        "ResultPath": "$.fileType"
+      },
+      "ParseFile": {
+        "Type": "Task",
+        "Resource": "${ParseFileFunctionArn}",
+        "Next": "MapFields",
+        "InputPath": "$",
+        "ResultPath": "$.parsedData"
+      },
+      "MapFields": {
+        "Type": "Task",
+        "Resource": "${MapFieldsFunctionArn}",
+        "Next": "AnyValidRecords?",
+        "InputPath": "$",
+        "ResultPath": "$.mappedData"
+      },
+      "AnyValidRecords?": {
+        "Type": "Choice",
+        "Choices": [
+          {
+            "Variable": "$.mappedData.valid",
+            "NumericGreaterThan": 0,
+            "Next": "StoreData"
+          }
+        ],
+        "Default": "ReportNoValidRecords"
+      },
+      "StoreData": {
+        "Type": "Task",
+        "Resource": "${StoreDataFunctionArn}",
+        "Next": "ReportSuccess",
+        "InputPath": "$",
+        "ResultPath": "$.storageResult"
+      },
+      "ReportSuccess": {
+        "Type": "Task",
+        "Resource": "${ReportSuccessFunctionArn}",
+        "End": true
+      },
+      "ReportValidationFailure": {
+        "Type": "Task",
+        "Resource": "${ReportFailureFunctionArn}",
+        "End": true,
+        "Parameters": {
+          "error": "Validation failure",
+          "cause.$": "$.validation.errors",
+          "input.$": "$"
+        }
+      },
+      "ReportNoValidRecords": {
+        "Type": "Task",
+        "Resource": "${ReportFailureFunctionArn}",
+        "End": true,
+        "Parameters": {
+          "error": "No valid records",
+          "cause": "After mapping fields, no valid records were found",
+          "input.$": "$"
+        }
+      }
+    }
+  }

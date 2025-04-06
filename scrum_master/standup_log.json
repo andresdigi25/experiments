@@ -1,0 +1,31 @@
+[
+    {
+        "date": "2025-03-19",
+        "status": {
+            "response": "good",
+            "sentiment": "Positive",
+            "entities": {}
+        },
+        "yesterday": {
+            "response": "nothibg",
+            "sentiment": "Neutral",
+            "entities": {}
+        },
+        "today": {
+            "response": "nope",
+            "sentiment": "Neutral",
+            "entities": {}
+        },
+        "blockers": {
+            "response": "a lot",
+            "sentiment": "Neutral",
+            "entities": {}
+        }
+    },
+    {
+        "How are you?": "bad",
+        "What did you do yesterday?": "a lot",
+        "What do you plan to do today?": "nothing",
+        "Do you have any blockers?": "a lot"
+    }
+]

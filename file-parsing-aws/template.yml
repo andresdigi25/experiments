@@ -1,0 +1,253 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: File Parsing and Mapping Solution using Step Functions
+
+Globals:
+  Function:
+    Timeout: 30
+    MemorySize: 256
+    Runtime: python3.9
+    Architectures:
+      - x86_64
+    Environment:
+      Variables:
+        DYNAMODB_TABLE: !Ref RecordsTable
+        FIELD_MAPPINGS_TABLE: !Ref FieldMappingsTable
+
+Resources:
+  # S3 Bucket for file uploads
+  UploadBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub "${AWS::StackName}-uploads-${AWS::AccountId}"
+      NotificationConfiguration:
+        EventBridgeConfiguration:
+          EventBridgeEnabled: true
+      CorsConfiguration:
+        CorsRules:
+          - AllowedHeaders: ['*']
+            AllowedMethods: [GET, PUT, POST, DELETE, HEAD]
+            AllowedOrigins: ['*']
+            MaxAge: 3600
+
+  # DynamoDB Tables
+  RecordsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub "${AWS::StackName}-records"
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: auth_id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: auth_id
+          KeyType: HASH
+
+  FieldMappingsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub "${AWS::StackName}-field-mappings"
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: mapping_name
+          AttributeType: S
+      KeySchema:
+        - AttributeName: mapping_name
+          KeyType: HASH
+
+  # Lambda Functions
+  ValidateFileFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: functions/validate_file/
+      Handler: app.lambda_handler
+      Policies:
+        - S3ReadPolicy:
+            BucketName: !Ref UploadBucket
+        - DynamoDBReadPolicy:
+            TableName: !Ref FieldMappingsTable
+
+  DetermineFileTypeFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: functions/determine_file_type/
+      Handler: app.lambda_handler
+      Policies:
+        - S3ReadPolicy:
+            BucketName: !Ref UploadBucket
+
+  ParseFileFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: functions/parse_file/
+      Handler: app.lambda_handler
+      MemorySize: 512
+      Timeout: 60
+      Policies:
+        - S3ReadPolicy:
+            BucketName: !Ref UploadBucket
+
+  MapFieldsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: functions/map_fields/
+      Handler: app.lambda_handler
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref FieldMappingsTable
+
+  StoreDataFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: functions/store_data/
+      Handler: app.lambda_handler
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref RecordsTable
+
+  ReportSuccessFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: functions/report_success/
+      Handler: app.lambda_handler
+      Policies:
+        - SNSPublishMessagePolicy:
+            TopicName: !GetAtt FileProcessingTopic.TopicName
+
+  ReportFailureFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: functions/report_failure/
+      Handler: app.lambda_handler
+      Policies:
+        - SNSPublishMessagePolicy:
+            TopicName: !GetAtt FileProcessingTopic.TopicName
+
+  # Additional Lambda for API to manage field mappings
+  ManageFieldMappingsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: functions/manage_field_mappings/
+      Handler: app.lambda_handler
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref FieldMappingsTable
+      Events:
+        GetMappings:
+          Type: Api
+          Properties:
+            Path: /mappings
+            Method: get
+        CreateMapping:
+          Type: Api
+          Properties:
+            Path: /mappings
+            Method: post
+
+  # Lambda to initiate file processing
+  InitiateFileProcessingFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: functions/initiate_file_processing/
+      Handler: app.lambda_handler
+      Policies:
+        - StepFunctionsExecutionPolicy:
+            StateMachineName: !GetAtt FileProcessingStateMachine.Name
+      Events:
+        S3Event:
+          Type: EventBridgeRule
+          Properties:
+            Pattern:
+              source:
+                - aws.s3
+              detail-type:
+                - Object Created
+              detail:
+                bucket:
+                  name:
+                    - !Ref UploadBucket
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /process
+            Method: post
+
+  # Step Functions State Machine
+  FileProcessingStateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      DefinitionUri: statemachine/file_processing.asl.json
+      DefinitionSubstitutions:
+        ValidateFileFunctionArn: !GetAtt ValidateFileFunction.Arn
+        DetermineFileTypeFunctionArn: !GetAtt DetermineFileTypeFunction.Arn
+        ParseFileFunctionArn: !GetAtt ParseFileFunction.Arn
+        MapFieldsFunctionArn: !GetAtt MapFieldsFunction.Arn
+        StoreDataFunctionArn: !GetAtt StoreDataFunction.Arn
+        ReportSuccessFunctionArn: !GetAtt ReportSuccessFunction.Arn
+        ReportFailureFunctionArn: !GetAtt ReportFailureFunction.Arn
+      Policies:
+        - LambdaInvokePolicy:
+            FunctionName: !Ref ValidateFileFunction
+        - LambdaInvokePolicy:
+            FunctionName: !Ref DetermineFileTypeFunction
+        - LambdaInvokePolicy:
+            FunctionName: !Ref ParseFileFunction
+        - LambdaInvokePolicy:
+            FunctionName: !Ref MapFieldsFunction
+        - LambdaInvokePolicy:
+            FunctionName: !Ref StoreDataFunction
+        - LambdaInvokePolicy:
+            FunctionName: !Ref ReportSuccessFunction
+        - LambdaInvokePolicy:
+            FunctionName: !Ref ReportFailureFunction
+
+  # SNS Topic for notifications
+  FileProcessingTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: !Sub "${AWS::StackName}-notifications"
+
+  # Lambda for file upload API endpoint
+  FileUploadFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: functions/file_upload/
+      Handler: app.lambda_handler
+      Policies:
+        - S3WritePolicy:
+            BucketName: !Ref UploadBucket
+      Events:
+        UploadFile:
+          Type: Api
+          Properties:
+            Path: /upload
+            Method: post
+
+Outputs:
+  UploadBucketName:
+    Description: "S3 bucket for file uploads"
+    Value: !Ref UploadBucket
+
+  RecordsTableName:
+    Description: "DynamoDB table for records"
+    Value: !Ref RecordsTable
+
+  FieldMappingsTableName:
+    Description: "DynamoDB table for field mappings"
+    Value: !Ref FieldMappingsTable
+
+  StateMachineArn:
+    Description: "ARN of the Step Functions state machine"
+    Value: !Ref FileProcessingStateMachine
+
+  ApiEndpoint:
+    Description: "API Gateway endpoint URL"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
+
+  FileUploadEndpoint:
+    Description: "File Upload API endpoint"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/upload"
+
+  ManageMappingsEndpoint:
+    Description: "Manage Field Mappings API endpoint"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/mappings"

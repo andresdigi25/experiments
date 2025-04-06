@@ -1,0 +1,6 @@
+client_name	street	town	region	zip_code	id
+Bruce Wayne	1 Wayne Manor	Gotham	NJ	07101	TXT001
+Clark Kent	344 Clinton St	Metropolis	NY	10001	TXT002
+Diana Prince	1720 H St NW	Washington	DC	20006	TXT003
+Peter Parker	20 Ingram St	Queens	NY	11375	TXT004
+Steve Rogers	569 Leaman Place	Brooklyn	NY	11201	TXT005

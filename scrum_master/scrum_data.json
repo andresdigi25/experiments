@@ -1,0 +1,32 @@
+{
+    "team_members": {
+        "felipe": {
+            "status": {
+                "feeling": "i am feeling well",
+                "yesterday": "nothing",
+                "today": "sleep",
+                "blockers": "none"
+            },
+            "history": {
+                "2025-03-19": {
+                    "feeling": "i am feeling well",
+                    "yesterday": "nothing",
+                    "today": "sleep",
+                    "blockers": "none"
+                }
+            }
+        },
+        "andres": {
+            "status": {
+                "yesterday": "",
+                "today": "",
+                "blockers": ""
+            },
+            "history": {}
+        }
+    },
+    "sprint": {
+        "current": null,
+        "history": []
+    }
+}

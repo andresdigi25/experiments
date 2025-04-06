@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Address Matching API Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #333;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+        }
+        .input-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #result {
+            margin-top: 20px;
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+            white-space: pre-wrap;
+        }
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border-left-color: #09f;
+            animation: spin 1s linear infinite;
+            margin: 10px auto;
+            display: none;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <h1>Address Matching API Test</h1>
+    
+    <div class="input-group">
+        <label for="apiUrl">API URL:</label>
+        <input type="text" id="apiUrl" placeholder="https://your-api-gateway-url/stage/match-addresses">
+    </div>
+    
+    <div class="input-group">
+        <label for="address1">Address 1:</label>
+        <input type="text" id="address1" value="123 Main Street, Apt 4B, New York, NY 10001">
+    </div>
+    
+    <div class="input-group">
+        <label for="address2">Address 2:</label>
+        <input type="text" id="address2" value="123 Main St, #4B, New York, NY 10001">
+    </div>
+    
+    <button onclick="testAddressMatching()">Test Match</button>
+    
+    <div class="spinner" id="spinner"></div>
+    <div id="result">Results will appear here...</div>
+    
+    <script>
+        async function testAddressMatching() {
+            const apiUrl = document.getElementById('apiUrl').value.trim();
+            const address1 = document.getElementById('address1').value.trim();
+            const address2 = document.getElementById('address2').value.trim();
+            const spinner = document.getElementById('spinner');
+            const resultDiv = document.getElementById('result');
+            
+            // Validation
+            if (!apiUrl) {
+                resultDiv.textContent = "Error: Please enter an API URL";
+                return;
+            }
+            
+            if (!address1 || !address2) {
+                resultDiv.textContent = "Error: Please enter both addresses";
+                return;
+            }
+            
+            // Request data
+            const requestData = {
+                addr1: address1,
+                addr2: address2
+            };
+            
+            // Show spinner
+            spinner.style.display = 'block';
+            resultDiv.textContent = "Sending request...";
+            
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(requestData)
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                resultDiv.textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                resultDiv.textContent = `Error: ${error.message}\n\nMake sure your API URL is correct and CORS is enabled.`;
+                console.error('Error:', error);
+            } finally {
+                // Hide spinner
+                spinner.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>

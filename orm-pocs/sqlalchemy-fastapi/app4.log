@@ -1,0 +1,36 @@
+2025-03-24 08:07:02,013 - INFO - {'trace_id': '70b664d9-1fb6-4a9c-9975-09c6a73c067d', 'event': 'request_start', 'method': 'PUT', 'url': 'http://localhost:8000/users/999', 'timestamp': '2025-03-24T13:07:02.013247'}
+2025-03-24 08:07:02,013 - INFO - {'trace_id': '70b664d9-1fb6-4a9c-9975-09c6a73c067d', 'event': 'request_start', 'method': 'PUT', 'url': 'http://localhost:8000/users/999', 'timestamp': '2025-03-24T13:07:02.013247'}
+2025-03-24 08:07:02,021 - WARNING - [TRACE_ID: 4b6500f5-27c7-4af2-8f48-822357ef4816] User with id 999 not found
+2025-03-24 08:07:02,021 - WARNING - [TRACE_ID: 4b6500f5-27c7-4af2-8f48-822357ef4816] User with id 999 not found
+2025-03-24 08:07:02,021 - INFO - {'trace_id': '70b664d9-1fb6-4a9c-9975-09c6a73c067d', 'event': 'request_end', 'status_code': 404, 'timestamp': '2025-03-24T13:07:02.021883'}
+2025-03-24 08:07:02,021 - INFO - {'trace_id': '70b664d9-1fb6-4a9c-9975-09c6a73c067d', 'event': 'request_end', 'status_code': 404, 'timestamp': '2025-03-24T13:07:02.021883'}
+2025-03-24 08:17:46,856 - INFO - {'trace_id': '30e7d866-495a-46fd-ad53-6eec9b048abb', 'event': 'request_start', 'method': 'PUT', 'url': 'http://localhost:8000/users/999', 'timestamp': '2025-03-24T13:17:46.856538'}
+2025-03-24 08:17:46,856 - INFO - {'trace_id': '30e7d866-495a-46fd-ad53-6eec9b048abb', 'event': 'request_start', 'method': 'PUT', 'url': 'http://localhost:8000/users/999', 'timestamp': '2025-03-24T13:17:46.856538'}
+2025-03-24 08:17:46,871 - WARNING - [TRACE_ID: 55609d22-b07f-4550-b24f-16cda5e7f0b6] User with id 999 not found
+2025-03-24 08:17:46,871 - WARNING - [TRACE_ID: 55609d22-b07f-4550-b24f-16cda5e7f0b6] User with id 999 not found
+2025-03-24 08:17:46,872 - INFO - {'trace_id': '30e7d866-495a-46fd-ad53-6eec9b048abb', 'event': 'request_end', 'status_code': 404, 'timestamp': '2025-03-24T13:17:46.872349'}
+2025-03-24 08:17:46,872 - INFO - {'trace_id': '30e7d866-495a-46fd-ad53-6eec9b048abb', 'event': 'request_end', 'status_code': 404, 'timestamp': '2025-03-24T13:17:46.872349'}
+2025-03-24 08:17:53,599 - INFO - {'trace_id': '336f9808-7dc2-4a9b-9924-cc221fff467b', 'event': 'request_start', 'method': 'PUT', 'url': 'http://localhost:8000/users/999', 'timestamp': '2025-03-24T13:17:53.599834'}
+2025-03-24 08:17:53,599 - INFO - {'trace_id': '336f9808-7dc2-4a9b-9924-cc221fff467b', 'event': 'request_start', 'method': 'PUT', 'url': 'http://localhost:8000/users/999', 'timestamp': '2025-03-24T13:17:53.599834'}
+2025-03-24 08:17:53,603 - WARNING - [TRACE_ID: 83eeda95-7f89-42bd-9e6e-26e2cb64ec1c] User with id 999 not found
+2025-03-24 08:17:53,603 - WARNING - [TRACE_ID: 83eeda95-7f89-42bd-9e6e-26e2cb64ec1c] User with id 999 not found
+2025-03-24 08:17:53,604 - INFO - {'trace_id': '336f9808-7dc2-4a9b-9924-cc221fff467b', 'event': 'request_end', 'status_code': 404, 'timestamp': '2025-03-24T13:17:53.604489'}
+2025-03-24 08:17:53,604 - INFO - {'trace_id': '336f9808-7dc2-4a9b-9924-cc221fff467b', 'event': 'request_end', 'status_code': 404, 'timestamp': '2025-03-24T13:17:53.604489'}
+2025-03-24 08:18:47,320 - INFO - {'trace_id': 'a8616568-1a36-4d20-867a-c5fa62f088bf', 'event': 'request_start', 'method': 'PUT', 'url': 'http://localhost:8000/users/999', 'timestamp': '2025-03-24T13:18:47.320054'}
+2025-03-24 08:18:47,320 - INFO - {'trace_id': 'a8616568-1a36-4d20-867a-c5fa62f088bf', 'event': 'request_start', 'method': 'PUT', 'url': 'http://localhost:8000/users/999', 'timestamp': '2025-03-24T13:18:47.320054'}
+2025-03-24 08:18:47,323 - WARNING - [TRACE_ID: 5faee4fb-98cb-4fb0-ba3b-303bd5df7ec2] User with id 999 not found
+2025-03-24 08:18:47,323 - WARNING - [TRACE_ID: 5faee4fb-98cb-4fb0-ba3b-303bd5df7ec2] User with id 999 not found
+2025-03-24 08:18:47,323 - INFO - {'trace_id': 'a8616568-1a36-4d20-867a-c5fa62f088bf', 'event': 'request_end', 'status_code': 404, 'timestamp': '2025-03-24T13:18:47.323959'}
+2025-03-24 08:18:47,323 - INFO - {'trace_id': 'a8616568-1a36-4d20-867a-c5fa62f088bf', 'event': 'request_end', 'status_code': 404, 'timestamp': '2025-03-24T13:18:47.323959'}
+2025-03-24 08:19:09,076 - INFO - {'trace_id': '7779cc75-6cc3-43cb-876e-a18d5d821d6a', 'event': 'request_start', 'method': 'PUT', 'url': 'http://localhost:8000/users/999', 'timestamp': '2025-03-24T13:19:09.076407'}
+2025-03-24 08:19:09,076 - INFO - {'trace_id': '7779cc75-6cc3-43cb-876e-a18d5d821d6a', 'event': 'request_start', 'method': 'PUT', 'url': 'http://localhost:8000/users/999', 'timestamp': '2025-03-24T13:19:09.076407'}
+2025-03-24 08:19:09,079 - WARNING - [TRACE_ID: e5b7d61f-16cc-40da-9d98-13b9a82a8631] User with id 999 not found
+2025-03-24 08:19:09,079 - WARNING - [TRACE_ID: e5b7d61f-16cc-40da-9d98-13b9a82a8631] User with id 999 not found
+2025-03-24 08:19:09,080 - INFO - {'trace_id': '7779cc75-6cc3-43cb-876e-a18d5d821d6a', 'event': 'request_end', 'status_code': 404, 'timestamp': '2025-03-24T13:19:09.080078'}
+2025-03-24 08:19:09,080 - INFO - {'trace_id': '7779cc75-6cc3-43cb-876e-a18d5d821d6a', 'event': 'request_end', 'status_code': 404, 'timestamp': '2025-03-24T13:19:09.080078'}
+2025-03-24 08:20:31,399 - INFO - {'trace_id': '1ceed0a8-2cc2-4e46-a0a8-9214c90378b5', 'event': 'request_start', 'method': 'PUT', 'url': 'http://localhost:8000/users/999', 'timestamp': '2025-03-24T13:20:31.399603'}
+2025-03-24 08:20:31,399 - INFO - {'trace_id': '1ceed0a8-2cc2-4e46-a0a8-9214c90378b5', 'event': 'request_start', 'method': 'PUT', 'url': 'http://localhost:8000/users/999', 'timestamp': '2025-03-24T13:20:31.399603'}
+2025-03-24 08:20:31,403 - WARNING - [TRACE_ID: c9b21bf9-e11f-4cfe-9644-1cd4b3de3e6a] User with id 999 not found
+2025-03-24 08:20:31,403 - WARNING - [TRACE_ID: c9b21bf9-e11f-4cfe-9644-1cd4b3de3e6a] User with id 999 not found
+2025-03-24 08:20:31,404 - INFO - {'trace_id': '1ceed0a8-2cc2-4e46-a0a8-9214c90378b5', 'event': 'request_end', 'status_code': 404, 'timestamp': '2025-03-24T13:20:31.404829'}
+2025-03-24 08:20:31,404 - INFO - {'trace_id': '1ceed0a8-2cc2-4e46-a0a8-9214c90378b5', 'event': 'request_end', 'status_code': 404, 'timestamp': '2025-03-24T13:20:31.404829'}

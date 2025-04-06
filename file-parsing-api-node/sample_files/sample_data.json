@@ -1,0 +1,42 @@
+[
+    {
+      "name": "Thomas Anderson",
+      "address": "555 Matrix St",
+      "city": "San Francisco",
+      "state": "CA",
+      "postal_code": "94105",
+      "authorization_id": "JSON001"
+    },
+    {
+      "name": "Sarah Connor",
+      "address": "888 Skynet Ave",
+      "city": "San Diego",
+      "state": "CA",
+      "postal_code": "92101",
+      "authorization_id": "JSON002"
+    },
+    {
+      "name": "John Wick",
+      "address": "777 Continental Blvd",
+      "city": "New York",
+      "state": "NY",
+      "postal_code": "10036",
+      "authorization_id": "JSON003"
+    },
+    {
+      "name": "Ellen Ripley",
+      "address": "123 Nostromo St",
+      "city": "Dallas",
+      "state": "TX",
+      "postal_code": "75201",
+      "authorization_id": "JSON004"
+    },
+    {
+      "name": "Tony Stark",
+      "address": "10880 Malibu Point",
+      "city": "Malibu",
+      "state": "CA",
+      "postal_code": "90265",
+      "authorization_id": "JSON005"
+    }
+  ]
